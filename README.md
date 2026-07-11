@@ -4,14 +4,10 @@
 
 **End-to-end analytics platform for global immunization coverage, disease incidence, and vaccine introduction trends — built on 15+ years of WHO data.**
 
-[![Python](https://img.shields.io/badge/Python-3.11-3776AB?logo=python&logoColor=white)](https://www.python.org/)
-[![Streamlit](https://img.shields.io/badge/Streamlit-App-FF4B4B?logo=streamlit&logoColor=white)](vaccination-data-analysis-and-visualization-vibxqle853xupnjfto.streamlit.app)
-[![SQLite](https://img.shields.io/badge/SQLite-Database-003B57?logo=sqlite&logoColor=white)](https://www.sqlite.org/)
-[![Power BI](https://img.shields.io/badge/Power%20BI-Star%20Schema-F2C811?logo=powerbi&logoColor=black)](https://powerbi.microsoft.com/)
-[![Plotly](https://img.shields.io/badge/Plotly-Charts-3F4F75?logo=plotly&logoColor=white)](https://plotly.com/)
-[![License](https://img.shields.io/badge/License-MIT-green.svg)](#license)
+## 🚀 Live Demo
 
-[Overview](#-overview) · [Live app](#-running-the-app) · [Data model](#-data-model) · [Dashboards](#-dashboard-pages) · [Power BI](#-power-bi-deliverable) · [Setup](#-setup)
+### 🌐 Streamlit Application
+https://vaccination-data-analysis-and-visualization-vibxqle853xupnjfto.streamlit.app/
 
 </div>
 
