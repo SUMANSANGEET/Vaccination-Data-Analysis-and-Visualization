@@ -3,7 +3,7 @@
 > **An End-to-End Data Analytics Project using Python, SQLite, Streamlit, and Power BI to analyze global vaccination coverage, disease incidence, immunization schedules, and vaccination trends.**
 
 LIVE STREAMLIT APP
-![Streamlit](https://img.shields.io/badge/Streamlit-Dashboard-red?logo=streamlit)
+![Streamlit](https://vaccination-data-analysis-and-visualization-vibxqle853xupnjfto.streamlit.app/)
 
 
 ---
