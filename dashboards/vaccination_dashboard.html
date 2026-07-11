@@ -1,0 +1,241 @@
+<style>
+  :root{
+    --bg:#0b1f1a; --panel:#0f2921; --panel2:#123027;
+    --line:#1c3d33; --line2:#254a3e;
+    --ink:#eef5f1; --ink-dim:#9db8ab; --ink-mute:#6f8a7d;
+    --teal:#1D9E75; --teal-lt:#5DCAA5; --amber:#EF9F27; --coral:#D85A30;
+    --blue:#378ADD; --purple:#7F77DD;
+  }
+  *{box-sizing:border-box}
+  #vdash{font-family:var(--font-sans,sans-serif);background:var(--bg);color:var(--ink);
+    border-radius:14px;overflow:hidden;border:1px solid var(--line)}
+  .vd-shell{display:flex;min-height:640px}
+  .vd-nav{width:200px;flex:none;background:var(--panel);border-right:1px solid var(--line);
+    padding:18px 10px;display:flex;flex-direction:column;gap:2px}
+  .vd-brand{padding:4px 10px 16px;font-size:13px;font-weight:500;color:var(--ink-dim);
+    letter-spacing:.03em;border-bottom:1px solid var(--line);margin-bottom:10px}
+  .vd-brand b{display:block;color:var(--ink);font-size:15px;font-weight:500}
+  .vd-item{display:flex;align-items:center;gap:9px;padding:9px 10px;border-radius:8px;
+    font-size:13px;color:var(--ink-dim);cursor:pointer;border:1px solid transparent;user-select:none}
+  .vd-item i{font-size:16px;width:16px;text-align:center}
+  .vd-item:hover{background:var(--panel2);color:var(--ink)}
+  .vd-item.active{background:var(--panel2);color:var(--ink);border-color:var(--line2)}
+  .vd-item.active i{color:var(--teal-lt)}
+  .vd-main{flex:1;padding:22px 26px;overflow-x:auto}
+  .vd-page{display:none}
+  .vd-page.active{display:block}
+  .vd-pagehead{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:16px;flex-wrap:wrap;gap:8px}
+  .vd-pagehead h2{font-size:18px;font-weight:500;margin:0;color:var(--ink)}
+  .vd-pagehead span{font-size:12px;color:var(--ink-mute)}
+  .vd-kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:18px}
+  .vd-kpi{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:14px 16px}
+  .vd-kpi .lbl{font-size:11px;color:var(--ink-mute);text-transform:uppercase;letter-spacing:.05em}
+  .vd-kpi .val{font-size:24px;font-weight:500;margin-top:4px}
+  .vd-kpi .sub{font-size:11px;color:var(--ink-dim);margin-top:3px}
+  .vd-grid{display:grid;gap:14px}
+  .vd-grid.two{grid-template-columns:1.3fr 1fr}
+  .vd-card{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:16px}
+  .vd-card h3{font-size:13px;font-weight:500;margin:0 0 12px;color:var(--ink-dim)}
+  .vd-card .chartwrap{position:relative;height:260px}
+  .vd-card .chartwrap.tall{height:340px}
+  .vd-controls{display:flex;gap:8px;margin-bottom:14px;flex-wrap:wrap}
+  .vd-controls select{background:var(--panel2);color:var(--ink);border:1px solid var(--line2);
+    border-radius:7px;padding:6px 10px;font-size:12px}
+  .vd-list{list-style:none;margin:0;padding:0;font-size:12px}
+  .vd-list li{display:flex;justify-content:space-between;padding:7px 0;border-bottom:1px solid var(--line)}
+  .vd-list li:last-child{border-bottom:none}
+  .vd-list .name{color:var(--ink-dim)}
+  .vd-list .num{color:var(--ink);font-weight:500}
+  .vd-note{font-size:11px;color:var(--ink-mute);margin-top:10px;line-height:1.5}
+  @media(max-width:760px){.vd-shell{flex-direction:column}.vd-nav{width:100%;flex-direction:row;overflow-x:auto}
+    .vd-kpis{grid-template-columns:repeat(2,1fr)}.vd-grid.two{grid-template-columns:1fr}}
+</style>
+
+<div id="vdash">
+  <div class="vd-shell">
+    <div class="vd-nav">
+      <div class="vd-brand"><b>WHO Vaccination</b>Coverage &amp; disease intelligence</div>
+      <div class="vd-item active" data-page="overview"><i class="ti ti-layout-dashboard"></i>Global overview</div>
+      <div class="vd-item" data-page="coverage"><i class="ti ti-vaccine"></i>Coverage explorer</div>
+      <div class="vd-item" data-page="disease"><i class="ti ti-activity"></i>Disease burden</div>
+      <div class="vd-item" data-page="scatter"><i class="ti ti-chart-dots"></i>Coverage vs incidence</div>
+      <div class="vd-item" data-page="intro"><i class="ti ti-calendar-event"></i>Vaccine introduction</div>
+      <div class="vd-item" data-page="region"><i class="ti ti-world"></i>Regional comparison</div>
+    </div>
+
+    <div class="vd-main">
+
+      <!-- PAGE 1: OVERVIEW -->
+      <div class="vd-page active" id="page-overview">
+        <div class="vd-pagehead"><h2>Global overview</h2><span id="ov-year"></span></div>
+        <div class="vd-kpis">
+          <div class="vd-kpi"><div class="lbl">Avg coverage</div><div class="val" id="kpi-cov"></div><div class="sub">across tracked antigens</div></div>
+          <div class="vd-kpi"><div class="lbl">Reported cases</div><div class="val" id="kpi-cases"></div><div class="sub">vaccine-preventable diseases</div></div>
+          <div class="vd-kpi"><div class="lbl">Countries below 80%</div><div class="val" id="kpi-below"></div><div class="sub" id="kpi-below-sub"></div></div>
+          <div class="vd-kpi"><div class="lbl">Vaccines tracked</div><div class="val" id="kpi-vax"></div><div class="sub">across all WHO sources</div></div>
+        </div>
+        <div class="vd-grid two">
+          <div class="vd-card"><h3>Coverage % vs reported cases, 2010&ndash;2023</h3>
+            <div class="chartwrap tall"><canvas id="chartTrend"></canvas></div></div>
+          <div class="vd-card"><h3>Coverage by WHO region (2023)</h3>
+            <div class="chartwrap tall"><canvas id="chartRegionBar"></canvas></div></div>
+        </div>
+        <div class="vd-note">Coverage % is administrative/official coverage as reported to WHO; values can exceed 100% where the administrative denominator undercounts the true target population &mdash; a known artifact of the source data, not a data-cleaning error.</div>
+      </div>
+
+      <!-- PAGE 2: COVERAGE EXPLORER -->
+      <div class="vd-page" id="page-coverage">
+        <div class="vd-pagehead"><h2>Coverage explorer</h2><span id="cov-year"></span></div>
+        <div class="vd-grid two">
+          <div class="vd-card"><h3>Top 10 countries by coverage</h3>
+            <div class="chartwrap tall"><canvas id="chartTop"></canvas></div></div>
+          <div class="vd-card"><h3>Bottom 10 countries by coverage</h3>
+            <div class="chartwrap tall"><canvas id="chartBottom"></canvas></div></div>
+        </div>
+      </div>
+
+      <!-- PAGE 3: DISEASE BURDEN -->
+      <div class="vd-page" id="page-disease">
+        <div class="vd-pagehead"><h2>Disease burden over time</h2><span>2010&ndash;2023</span></div>
+        <div class="vd-controls">
+          <select id="diseaseSelect"></select>
+        </div>
+        <div class="vd-card"><h3>Reported cases by year</h3>
+          <div class="chartwrap tall"><canvas id="chartDisease"></canvas></div></div>
+      </div>
+
+      <!-- PAGE 4: SCATTER -->
+      <div class="vd-page" id="page-scatter">
+        <div class="vd-pagehead"><h2>Coverage vs incidence rate</h2><span id="sc-year"></span></div>
+        <div class="vd-card"><h3>Each point = one country (2023)</h3>
+          <div class="chartwrap tall"><canvas id="chartScatter"></canvas></div></div>
+        <div class="vd-note">Countries in the lower-right (high coverage, low incidence) show vaccination working as intended; upper-left outliers are worth investigating for coverage-quality or reporting issues.</div>
+      </div>
+
+      <!-- PAGE 5: INTRODUCTION -->
+      <div class="vd-page" id="page-intro">
+        <div class="vd-pagehead"><h2>Vaccine introduction timeline</h2><span>New vaccines introduced per year, by WHO region</span></div>
+        <div class="vd-card"><h3>Distinct vaccines introduced by region</h3>
+          <div class="chartwrap tall"><canvas id="chartIntro"></canvas></div></div>
+      </div>
+
+      <!-- PAGE 6: REGIONAL COMPARISON -->
+      <div class="vd-page" id="page-region">
+        <div class="vd-pagehead"><h2>Regional comparison</h2><span id="rg-year"></span></div>
+        <div class="vd-grid two">
+          <div class="vd-card"><h3>Avg coverage % by region</h3>
+            <div class="chartwrap"><canvas id="chartRegCov"></canvas></div></div>
+          <div class="vd-card"><h3>Reported cases by region</h3>
+            <div class="chartwrap"><canvas id="chartRegCases"></canvas></div></div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"></script>
+<script>
+const DATA = {"global_trend": {"years": [2010, 2011, 2012, 2013, 2014, 2015, 2016, 2017, 2018, 2019, 2020, 2021, 2022, 2023], "avg_coverage": [86.5, 87.1, 87.1, 86.5, 86.1, 85.4, 85.6, 85.5, 87.6, 84.9, 83.3, 80.3, 81.5, 82.5], "total_cases": [1228243, 1404497, 1268080, 1092356, 841858, 803675, 952745, 944816, 1108272, 1437192, 1459097, 2316209, 3605630, 5889519], "avg_incidence": [86.8, 64.14, 52.12, 41.8, 40.15, 69.18, 55.96, 46.17, 48.99, 117.67, 77.27, 111.12, 129.72, 191.95]}, "region_summary": [{"region": "African Region", "code": "AFRO", "avg_coverage": 80.4, "total_cases": 4449384}, {"region": "Region of the Americas", "code": "AMRO", "avg_coverage": 80.2, "total_cases": 23040}, {"region": "Eastern Mediterranean Region", "code": "EMRO", "avg_coverage": 84.1, "total_cases": 136339}, {"region": "European Region", "code": "EURO", "avg_coverage": 82.7, "total_cases": 154833}, {"region": "South-East Asia Region", "code": "SEARO", "avg_coverage": 83.9, "total_cases": 1034459}, {"region": "Western Pacific Region", "code": "WPRO", "avg_coverage": 87.7, "total_cases": 91464}], "disease_trend_years": [2010, 2011, 2012, 2013, 2014, 2015, 2016, 2017, 2018, 2019, 2020, 2021, 2022, 2023], "disease_trend": {"Congenital rubella syndrome": [31, 214, 305, 134, 142, 282, 369, 835, 449, 425, 1252, 716, 1527, 1534], "Diphtheria": [4603, 5626, 4490, 4680, 7774, 4535, 7102, 8819, 16911, 22986, 10137, 8659, 10018, 24779], "Invasive meningococcal disease": [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 21128, 26062, 16331, 5561], "Japanese encephalitis": [3856, 3393, 2354, 3877, 4815, 4088, 5401, 4673, 4402, 3712, 1532, 988, 1886, 2114], "Measles": [343820, 359347, 212385, 275316, 282128, 214826, 132499, 173532, 360316, 873730, 160242, 123164, 205203, 663838], "Mumps": [620218, 727486, 688173, 516531, 311692, 385898, 592252, 563140, 504085, 170730, 279606, 242238, 381333, 385049], "Neonatal tetanus": [5085, 4295, 4654, 4149, 2238, 3580, 1997, 2266, 1803, 2173, 2300, 4140, 2099, 4585], "Pertussis": [161299, 173634, 250357, 172136, 186515, 156147, 174658, 163257, 169469, 149979, 69657, 30681, 64342, 159917], "Poliomyelitis": [1412, 717, 294, 482, 415, 106, 42, 118, 137, 378, 1113, 700, 865, 538], "Rubella": [76001, 114544, 94327, 101206, 33523, 23769, 23423, 14756, 26045, 49307, 10325, 10023, 17928, 35718], "Total tetanus": [11181, 12650, 10479, 13532, 12531, 10340, 13813, 12510, 15103, 14745, 11897, 9829, 6706, 21833], "Typhoid": [0, 0, 0, 19, 31, 32, 35, 34, 7488, 148568, 888769, 1858728, 2897175, 4583577], "Yellow fever": [737, 2591, 262, 294, 54, 72, 1154, 876, 2064, 459, 1139, 281, 217, 476]}, "scatter": [{"country": "Tuvalu", "region": "Western Pacific Region", "coverage": 96.3, "incidence": 16707.4}, {"country": "Eswatini", "region": "African Region", "coverage": 75.4, "incidence": 4709.17}, {"country": "Angola", "region": "African Region", "coverage": 66.1, "incidence": 3599.17}, {"country": "Mali", "region": "African Region", "coverage": 81.5, "incidence": 2347.06}, {"country": "Democratic Republic of the Congo", "region": "African Region", "coverage": 67.9, "incidence": 2210.55}, {"country": "Nepal", "region": "South-East Asia Region", "coverage": 92.3, "incidence": 1704.0}, {"country": "Sierra Leone", "region": "African Region", "coverage": 87.7, "incidence": 1419.74}, {"country": "Namibia", "region": "African Region", "coverage": 79.2, "incidence": 1243.72}, {"country": "Kenya", "region": "African Region", "coverage": 78.3, "incidence": 1009.4}, {"country": "Azerbaijan", "region": "European Region", "coverage": 81.1, "incidence": 640.15}, {"country": "United Republic of Tanzania", "region": "African Region", "coverage": 103.7, "incidence": 542.12}, {"country": "C\u00f4te d'Ivoire", "region": "African Region", "coverage": 82.8, "incidence": 395.42}, {"country": "Uganda", "region": "African Region", "coverage": 80.5, "incidence": 393.34}, {"country": "Central African Republic", "region": "African Region", "coverage": 79.2, "incidence": 342.68}, {"country": "Montenegro", "region": "European Region", "coverage": 57.2, "incidence": 334.65}, {"country": "Kyrgyzstan", "region": "European Region", "coverage": 81.0, "incidence": 324.7}, {"country": "Croatia", "region": "European Region", "coverage": 85.4, "incidence": 248.62}, {"country": "Liberia", "region": "African Region", "coverage": 88.2, "incidence": 212.08}, {"country": "Yemen", "region": "Eastern Mediterranean Region", "coverage": 58.7, "incidence": 182.23}, {"country": "Chad", "region": "African Region", "coverage": 82.5, "incidence": 176.67}, {"country": "Denmark", "region": "European Region", "coverage": 85.1, "incidence": 171.3}, {"country": "Eritrea", "region": "African Region", "coverage": 85.5, "incidence": 154.18}, {"country": "Kazakhstan", "region": "European Region", "coverage": 91.9, "incidence": 153.52}, {"country": "South Sudan", "region": "African Region", "coverage": 85.7, "incidence": 132.49}, {"country": "Tonga", "region": "Western Pacific Region", "coverage": 93.1, "incidence": 114.7}, {"country": "Ghana", "region": "African Region", "coverage": 87.8, "incidence": 104.05}, {"country": "Djibouti", "region": "Eastern Mediterranean Region", "coverage": 76.6, "incidence": 100.83}, {"country": "Sao Tome and Principe", "region": "African Region", "coverage": 78.6, "incidence": 95.3}, {"country": "Russian Federation", "region": "European Region", "coverage": 92.1, "incidence": 93.34}, {"country": "Andorra", "region": "European Region", "coverage": 91.9, "incidence": 92.75}, {"country": "Burundi", "region": "African Region", "coverage": 84.9, "incidence": 87.84}, {"country": "Gabon", "region": "African Region", "coverage": 67.6, "incidence": 79.37}, {"country": "Somalia", "region": "Eastern Mediterranean Region", "coverage": 56.0, "incidence": 76.15}, {"country": "Botswana", "region": "African Region", "coverage": 74.9, "incidence": 75.93}, {"country": "Senegal", "region": "African Region", "coverage": 78.5, "incidence": 73.1}, {"country": "Zimbabwe", "region": "African Region", "coverage": 81.2, "incidence": 71.6}, {"country": "Austria", "region": "European Region", "coverage": 72.2, "incidence": 65.8}, {"country": "Solomon Islands", "region": "Western Pacific Region", "coverage": 77.7, "incidence": 65.6}, {"country": "India", "region": "South-East Asia Region", "coverage": 87.7, "incidence": 64.81}, {"country": "Cameroon", "region": "African Region", "coverage": 72.9, "incidence": 54.35}, {"country": "Zambia", "region": "African Region", "coverage": 73.8, "incidence": 54.26}, {"country": "Samoa", "region": "Western Pacific Region", "coverage": 87.3, "incidence": 52.33}, {"country": "Armenia", "region": "European Region", "coverage": 83.3, "incidence": 52.07}, {"country": "Ethiopia", "region": "African Region", "coverage": 82.0, "incidence": 51.98}, {"country": "Tajikistan", "region": "European Region", "coverage": 93.0, "incidence": 50.27}, {"country": "Bolivia (Plurinational State of)", "region": "Region of the Americas", "coverage": 66.1, "incidence": 47.42}, {"country": "Iraq", "region": "Eastern Mediterranean Region", "coverage": 74.6, "incidence": 46.23}, {"country": "Papua New Guinea", "region": "Western Pacific Region", "coverage": 40.6, "incidence": 44.8}, {"country": "Libya", "region": "Eastern Mediterranean Region", "coverage": 86.2, "incidence": 44.27}, {"country": "Guinea-Bissau", "region": "African Region", "coverage": 70.9, "incidence": 41.17}, {"country": "Republic of Moldova", "region": "European Region", "coverage": 81.8, "incidence": 40.38}, {"country": "Norway", "region": "European Region", "coverage": 91.7, "incidence": 38.77}, {"country": "Serbia", "region": "European Region", "coverage": 72.6, "incidence": 36.65}, {"country": "Niger", "region": "African Region", "coverage": 90.4, "incidence": 35.54}, {"country": "Nigeria", "region": "African Region", "coverage": 64.9, "incidence": 32.82}, {"country": "El Salvador", "region": "Region of the Americas", "coverage": 86.3, "incidence": 32.62}, {"country": "Belarus", "region": "European Region", "coverage": 92.9, "incidence": 31.05}, {"country": "Equatorial Guinea", "region": "African Region", "coverage": 66.6, "incidence": 30.32}, {"country": "San Marino", "region": "European Region", "coverage": 69.0, "incidence": 29.6}, {"country": "Philippines", "region": "Western Pacific Region", "coverage": 66.5, "incidence": 29.46}, {"country": "Lebanon", "region": "Eastern Mediterranean Region", "coverage": 69.9, "incidence": 29.21}, {"country": "Comoros", "region": "African Region", "coverage": 69.1, "incidence": 29.18}, {"country": "Chile", "region": "Region of the Americas", "coverage": 90.0, "incidence": 27.5}, {"country": "Lesotho", "region": "African Region", "coverage": 80.2, "incidence": 27.27}, {"country": "Uruguay", "region": "Region of the Americas", "coverage": 81.3, "incidence": 26.5}, {"country": "China, Macao SAR", "region": "Western Pacific Region", "coverage": 90.4, "incidence": 25.2}, {"country": "Romania", "region": "European Region", "coverage": 55.6, "incidence": 25.19}, {"country": "Egypt", "region": "Eastern Mediterranean Region", "coverage": 96.2, "incidence": 24.98}, {"country": "Netherlands (Kingdom of the)", "region": "European Region", "coverage": 80.9, "incidence": 24.49}, {"country": "United Arab Emirates", "region": "Eastern Mediterranean Region", "coverage": 91.3, "incidence": 23.84}, {"country": "Colombia", "region": "Region of the Americas", "coverage": 81.6, "incidence": 22.62}, {"country": "Kiribati", "region": "Western Pacific Region", "coverage": 77.9, "incidence": 22.6}, {"country": "Republic of Korea", "region": "Western Pacific Region", "coverage": 92.7, "incidence": 22.36}, {"country": "Dominican Republic", "region": "Region of the Americas", "coverage": 86.5, "incidence": 22.25}, {"country": "Belgium", "region": "European Region", "coverage": 88.5, "incidence": 22.2}, {"country": "Fiji", "region": "Western Pacific Region", "coverage": 85.5, "incidence": 21.43}, {"country": "Spain", "region": "European Region", "coverage": 81.3, "incidence": 20.22}, {"country": "Mongolia", "region": "Western Pacific Region", "coverage": 93.5, "incidence": 20.2}, {"country": "Togo", "region": "African Region", "coverage": 82.7, "incidence": 19.9}, {"country": "Qatar", "region": "Eastern Mediterranean Region", "coverage": 92.4, "incidence": 18.02}, {"country": "Afghanistan", "region": "Eastern Mediterranean Region", "coverage": 68.5, "incidence": 17.56}, {"country": "Mauritania", "region": "African Region", "coverage": 77.0, "incidence": 16.47}, {"country": "Australia", "region": "Western Pacific Region", "coverage": 88.4, "incidence": 15.96}, {"country": "Slovenia", "region": "European Region", "coverage": 62.7, "incidence": 15.72}, {"country": "Bermuda", "region": "Region of the Americas", "coverage": 80.7, "incidence": 15.5}, {"country": "Pakistan", "region": "Eastern Mediterranean Region", "coverage": 86.9, "incidence": 14.94}, {"country": "Malaysia", "region": "Western Pacific Region", "coverage": 97.0, "incidence": 14.11}, {"country": "Portugal", "region": "European Region", "coverage": 95.0, "incidence": 13.6}, {"country": "Latvia", "region": "European Region", "coverage": 88.1, "incidence": 13.38}, {"country": "Indonesia", "region": "South-East Asia Region", "coverage": 73.5, "incidence": 12.43}, {"country": "Ecuador", "region": "Region of the Americas", "coverage": 80.0, "incidence": 12.2}, {"country": "Luxembourg", "region": "European Region", "coverage": 81.2, "incidence": 12.03}, {"country": "Maldives", "region": "South-East Asia Region", "coverage": 95.5, "incidence": 12.03}, {"country": "Saudi Arabia", "region": "Eastern Mediterranean Region", "coverage": 89.4, "incidence": 11.89}, {"country": "Paraguay", "region": "Region of the Americas", "coverage": 71.2, "incidence": 11.62}, {"country": "Slovakia", "region": "European Region", "coverage": 82.3, "incidence": 10.48}, {"country": "Oman", "region": "Eastern Mediterranean Region", "coverage": 95.6, "incidence": 10.36}, {"country": "Syrian Arab Republic", "region": "Eastern Mediterranean Region", "coverage": 67.3, "incidence": 10.1}, {"country": "Congo", "region": "African Region", "coverage": 69.7, "incidence": 9.99}, {"country": "Costa Rica", "region": "Region of the Americas", "coverage": 89.9, "incidence": 9.8}, {"country": "Sudan", "region": "Eastern Mediterranean Region", "coverage": 51.7, "incidence": 9.53}, {"country": "Burkina Faso", "region": "African Region", "coverage": 91.7, "incidence": 9.52}, {"country": "Gambia", "region": "African Region", "coverage": 77.1, "incidence": 9.45}, {"country": "Czechia", "region": "European Region", "coverage": 81.4, "incidence": 9.38}, {"country": "Aruba", "region": "Region of the Americas", "coverage": 88.2, "incidence": 9.3}, {"country": "Ireland", "region": "European Region", "coverage": 83.1, "incidence": 9.18}, {"country": "occupied Palestinian territory, including east Jerusalem", "region": "Eastern Mediterranean Region", "coverage": 88.8, "incidence": 8.96}, {"country": "Georgia", "region": "European Region", "coverage": 78.1, "incidence": 8.92}, {"country": "Micronesia (Federated States of)", "region": "Western Pacific Region", "coverage": 74.6, "incidence": 8.9}, {"country": "Ukraine", "region": "European Region", "coverage": 72.7, "incidence": 8.67}, {"country": "Poland", "region": "European Region", "coverage": 89.2, "incidence": 8.63}, {"country": "Uzbekistan", "region": "European Region", "coverage": 98.6, "incidence": 8.4}, {"country": "Bosnia and Herzegovina", "region": "European Region", "coverage": 65.9, "incidence": 8.1}, {"country": "China", "region": "Western Pacific Region", "coverage": 96.8, "incidence": 7.45}, {"country": "French Polynesia", "region": "Western Pacific Region", "coverage": 10.0, "incidence": 7.1}, {"country": "Benin", "region": "African Region", "coverage": 84.9, "incidence": 7.08}, {"country": "Lao People's Democratic Republic", "region": "Western Pacific Region", "coverage": 81.2, "incidence": 7.01}, {"country": "New Caledonia", "region": "Western Pacific Region", "coverage": 36.8, "incidence": 6.85}, {"country": "Honduras", "region": "Region of the Americas", "coverage": 73.7, "incidence": 6.62}, {"country": "Kosovo (in accordance with UN Security Council resolution 1244 (1999))", "region": "European Region", "coverage": 85.5, "incidence": 6.47}, {"country": "Bhutan", "region": "South-East Asia Region", "coverage": 95.6, "incidence": 6.27}, {"country": "Malta", "region": "European Region", "coverage": 86.2, "incidence": 6.27}, {"country": "Sri Lanka", "region": "South-East Asia Region", "coverage": 93.2, "incidence": 6.19}, {"country": "Mozambique", "region": "African Region", "coverage": 84.4, "incidence": 5.9}, {"country": "Canada", "region": "Region of the Americas", "coverage": 80.1, "incidence": 5.84}, {"country": "United Kingdom of Great Britain and Northern Ireland", "region": "European Region", "coverage": 79.4, "incidence": 5.74}, {"country": "Estonia", "region": "European Region", "coverage": 73.0, "incidence": 5.7}, {"country": "Mauritius", "region": "African Region", "coverage": 83.4, "incidence": 5.55}, {"country": "Finland", "region": "European Region", "coverage": 87.9, "incidence": 5.46}, {"country": "Germany", "region": "European Region", "coverage": 76.0, "incidence": 5.4}, {"country": "Madagascar", "region": "African Region", "coverage": 76.9, "incidence": 5.17}, {"country": "Bahrain", "region": "Eastern Mediterranean Region", "coverage": 94.4, "incidence": 5.1}, {"country": "Argentina", "region": "Region of the Americas", "coverage": 64.2, "incidence": 5.0}, {"country": "Guinea", "region": "African Region", "coverage": 63.1, "incidence": 4.93}, {"country": "South Africa", "region": "African Region", "coverage": 74.6, "incidence": 4.85}, {"country": "Brazil", "region": "Region of the Americas", "coverage": 76.9, "incidence": 4.24}, {"country": "Kuwait", "region": "Eastern Mediterranean Region", "coverage": 98.8, "incidence": 3.96}, {"country": "Tunisia", "region": "Eastern Mediterranean Region", "coverage": 92.8, "incidence": 3.83}, {"country": "Venezuela (Bolivarian Republic of)", "region": "Region of the Americas", "coverage": 53.0, "incidence": 3.4}, {"country": "Vanuatu", "region": "Western Pacific Region", "coverage": 69.7, "incidence": 3.1}, {"country": "Sweden", "region": "European Region", "coverage": 91.3, "incidence": 3.05}, {"country": "Thailand", "region": "South-East Asia Region", "coverage": 72.3, "incidence": 2.95}, {"country": "Malawi", "region": "African Region", "coverage": 83.9, "incidence": 2.93}, {"country": "Rwanda", "region": "African Region", "coverage": 91.8, "incidence": 2.83}, {"country": "Lithuania", "region": "European Region", "coverage": 76.8, "incidence": 2.78}, {"country": "Brunei Darussalam", "region": "Western Pacific Region", "coverage": 95.1, "incidence": 2.75}, {"country": "France", "region": "European Region", "coverage": 71.7, "incidence": 2.72}, {"country": "Switzerland", "region": "European Region", "coverage": 84.1, "incidence": 2.7}, {"country": "Jordan", "region": "Eastern Mediterranean Region", "coverage": 93.8, "incidence": 2.7}, {"country": "Iceland", "region": "European Region", "coverage": 89.6, "incidence": 2.6}], "intro_by_region": {"years": [2010, 2011, 2012, 2013, 2014, 2015, 2016, 2017, 2018, 2019, 2020, 2021, 2022, 2023], "series": {"African Region": [14, 15, 15, 15, 15, 15, 15, 16, 16, 17, 17, 17, 18, 18], "Region of the Americas": [19, 19, 19, 19, 19, 19, 19, 19, 19, 19, 19, 19, 19, 19], "Eastern Mediterranean Region": [16, 16, 16, 17, 17, 17, 17, 17, 17, 17, 17, 18, 18, 18], "European Region": [17, 17, 17, 18, 17, 17, 17, 17, 17, 17, 17, 17, 17, 17], "South-East Asia Region": [11, 11, 11, 11, 11, 12, 13, 13, 14, 14, 14, 15, 15, 15], "Western Pacific Region": [18, 18, 18, 18, 18, 18, 18, 18, 18, 18, 18, 19, 19, 19], "Unknown / Unassigned": [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]}}, "top_countries": [{"country": "Marshall Islands", "coverage": 156.4}, {"country": "United Republic of Tanzania", "coverage": 103.7}, {"country": "Tokelau", "coverage": 99.5}, {"country": "Kuwait", "coverage": 98.8}, {"country": "Cuba", "coverage": 98.7}, {"country": "Uzbekistan", "coverage": 98.6}, {"country": "Turkmenistan", "coverage": 98.5}, {"country": "Niue", "coverage": 98.4}, {"country": "Nauru", "coverage": 97.9}, {"country": "Nicaragua", "coverage": 97.6}], "bottom_countries": [{"country": "French Polynesia", "coverage": 10.0}, {"country": "Democratic People's Republic of Korea", "coverage": 35.5}, {"country": "New Caledonia", "coverage": 36.8}, {"country": "Papua New Guinea", "coverage": 40.6}, {"country": "Sudan", "coverage": 51.7}, {"country": "Venezuela (Bolivarian Republic of)", "coverage": 53.0}, {"country": "Romania", "coverage": 55.6}, {"country": "Somalia", "coverage": 56.0}, {"country": "Montenegro", "coverage": 57.2}, {"country": "Yemen", "coverage": 58.7}], "kpis": {"latest_year": 2023, "avg_coverage_latest": 82.5, "total_cases_latest": 5889519, "countries_below_80": 79, "total_countries": 210, "vaccines_tracked": 21}};
+
+document.querySelectorAll('.vd-item').forEach(item=>{
+  item.addEventListener('click', ()=>{
+    document.querySelectorAll('.vd-item').forEach(i=>i.classList.remove('active'));
+    document.querySelectorAll('.vd-page').forEach(p=>p.classList.remove('active'));
+    item.classList.add('active');
+    document.getElementById('page-'+item.dataset.page).classList.add('active');
+  });
+});
+
+Chart.defaults.color = '#9db8ab';
+Chart.defaults.font.size = 11;
+Chart.defaults.borderColor = '#1c3d33';
+const GRID = { color:'#1c3d33' };
+
+const latest = DATA.kpis.latest_year;
+document.querySelectorAll('#ov-year,#cov-year,#sc-year,#rg-year').forEach(el=>el.textContent = 'Year: '+latest);
+
+document.getElementById('kpi-cov').textContent = DATA.kpis.avg_coverage_latest + '%';
+document.getElementById('kpi-cases').textContent = DATA.kpis.total_cases_latest.toLocaleString();
+document.getElementById('kpi-below').textContent = DATA.kpis.countries_below_80;
+document.getElementById('kpi-below-sub').textContent = 'of ' + DATA.kpis.total_countries + ' reporting countries';
+document.getElementById('kpi-vax').textContent = DATA.kpis.vaccines_tracked;
+
+new Chart(document.getElementById('chartTrend'), {
+  data:{ labels: DATA.global_trend.years,
+    datasets:[
+      {type:'line', label:'Avg coverage %', data: DATA.global_trend.avg_coverage, borderColor:'#5DCAA5', backgroundColor:'#5DCAA5', yAxisID:'y', tension:.3, pointRadius:0, borderWidth:2},
+      {type:'bar', label:'Total cases', data: DATA.global_trend.total_cases, backgroundColor:'#D85A3066', yAxisID:'y1'}
+    ]},
+  options:{ maintainAspectRatio:false, interaction:{mode:'index',intersect:false},
+    scales:{ x:{grid:GRID}, y:{position:'left', grid:GRID, title:{display:true,text:'Coverage %'}},
+      y1:{position:'right', grid:{display:false}, title:{display:true,text:'Cases'}} },
+    plugins:{legend:{position:'bottom'}} }
+});
+
+new Chart(document.getElementById('chartRegionBar'), {
+  type:'bar',
+  data:{ labels: DATA.region_summary.map(r=>r.region),
+    datasets:[{label:'Avg coverage %', data: DATA.region_summary.map(r=>r.avg_coverage), backgroundColor:'#1D9E75'}]},
+  options:{ maintainAspectRatio:false, indexAxis:'y', scales:{x:{grid:GRID},y:{grid:{display:false}}}, plugins:{legend:{display:false}} }
+});
+
+new Chart(document.getElementById('chartTop'), {
+  type:'bar',
+  data:{ labels: DATA.top_countries.map(c=>c.country), datasets:[{label:'Coverage %', data: DATA.top_countries.map(c=>c.coverage), backgroundColor:'#5DCAA5'}]},
+  options:{ maintainAspectRatio:false, indexAxis:'y', scales:{x:{grid:GRID},y:{grid:{display:false}}}, plugins:{legend:{display:false}} }
+});
+new Chart(document.getElementById('chartBottom'), {
+  type:'bar',
+  data:{ labels: DATA.bottom_countries.map(c=>c.country), datasets:[{label:'Coverage %', data: DATA.bottom_countries.map(c=>c.coverage), backgroundColor:'#D85A30'}]},
+  options:{ maintainAspectRatio:false, indexAxis:'y', scales:{x:{grid:GRID},y:{grid:{display:false}}}, plugins:{legend:{display:false}} }
+});
+
+const diseaseNames = Object.keys(DATA.disease_trend);
+const sel = document.getElementById('diseaseSelect');
+diseaseNames.forEach(n=>{ const o=document.createElement('option'); o.value=n; o.textContent=n; sel.appendChild(o); });
+let diseaseChart;
+function renderDisease(name){
+  const d = DATA.disease_trend[name];
+  if(diseaseChart) diseaseChart.destroy();
+  diseaseChart = new Chart(document.getElementById('chartDisease'), {
+    type:'line',
+    data:{ labels: DATA.disease_trend_years, datasets:[{label: name+' cases', data:d, borderColor:'#EF9F27', backgroundColor:'#EF9F2733', fill:true, tension:.25, pointRadius:0, borderWidth:2}]},
+    options:{ maintainAspectRatio:false, scales:{x:{grid:GRID},y:{grid:GRID}}, plugins:{legend:{display:false}} }
+  });
+}
+sel.addEventListener('change', e=>renderDisease(e.target.value));
+renderDisease(diseaseNames.includes('Measles') ? 'Measles' : diseaseNames[0]);
+
+const regionColors = {'African Region':'#D85A30','Region of the Americas':'#378ADD','Eastern Mediterranean Region':'#EF9F27',
+  'European Region':'#7F77DD','South-East Asia Region':'#5DCAA5','Western Pacific Region':'#D4537E','Unknown / Unassigned':'#888780'};
+const byRegion = {};
+DATA.scatter.forEach(p=>{ (byRegion[p.region] ||= []).push({x:p.coverage, y:p.incidence, country:p.country}); });
+new Chart(document.getElementById('chartScatter'), {
+  type:'scatter',
+  data:{ datasets: Object.keys(byRegion).map(r=>({label:r, data:byRegion[r], backgroundColor:(regionColors[r]||'#888780')+'CC'})) },
+  options:{ maintainAspectRatio:false,
+    scales:{ x:{title:{display:true,text:'Coverage %'}, grid:GRID}, y:{title:{display:true,text:'Incidence rate'}, grid:GRID} },
+    plugins:{ legend:{position:'bottom'},
+      tooltip:{ callbacks:{ label: ctx => `${ctx.raw.country}: coverage ${ctx.raw.x}%, incidence ${ctx.raw.y}` } } } }
+});
+
+new Chart(document.getElementById('chartIntro'), {
+  type:'bar',
+  data:{ labels: DATA.intro_by_region.years,
+    datasets: Object.keys(DATA.intro_by_region.series).map(r=>({
+      label:r, data: DATA.intro_by_region.series[r], backgroundColor:(regionColors[r]||'#888780') })) },
+  options:{ maintainAspectRatio:false, scales:{x:{stacked:true,grid:GRID},y:{stacked:true,grid:GRID}}, plugins:{legend:{position:'bottom'}} }
+});
+
+new Chart(document.getElementById('chartRegCov'), {
+  type:'bar',
+  data:{ labels: DATA.region_summary.map(r=>r.region), datasets:[{label:'Avg coverage %', data: DATA.region_summary.map(r=>r.avg_coverage), backgroundColor:'#1D9E75'}]},
+  options:{ maintainAspectRatio:false, scales:{x:{grid:GRID},y:{grid:GRID}}, plugins:{legend:{display:false}} }
+});
+new Chart(document.getElementById('chartRegCases'), {
+  type:'bar',
+  data:{ labels: DATA.region_summary.map(r=>r.region), datasets:[{label:'Total cases', data: DATA.region_summary.map(r=>r.total_cases), backgroundColor:'#D85A30'}]},
+  options:{ maintainAspectRatio:false, scales:{x:{grid:GRID},y:{grid:GRID}}, plugins:{legend:{display:false}} }
+});
+</script>
